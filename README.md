@@ -1,6 +1,6 @@
 <div align="center">
   
-<img alt="entraudit-banner" src="https://raw.githubusercontent.com/r0otsec/ShipHappens/refs/heads/main/assets/entraudit-banner.png" />
+<img alt="entraudit-banner" src="https://raw.githubusercontent.com/r0otsec/Entraudit/refs/heads/main/assets/entraudit-banner.png" />
 
 ### A realistic, vulnerable CI/CD pipeline deployment lab lab for offensive and defensive training against CI/CD pipelines, DevOps and supply chains.
 
