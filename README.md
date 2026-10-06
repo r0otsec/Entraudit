@@ -26,7 +26,7 @@ the third-party service icons used in the PDF/HTML reports.
 ## Requirements
 
 - PowerShell 7+ (`pwsh`)
-- The account(s) you sign in with need, at minimum, **Global Reader + Security Reader** Entra ID directory roles for the Graph/Exchange/SharePoint/Teams/ Compliance checks. **Power BI** checks additionally need **Power BI Service Administrator** or **Fabric Administrator** — Global Reader/Security Reader does not cover Power BI/Fabric tenant settings.
+- The account(s) you sign in with need, at minimum, **Global Reader + Security Reader** Entra ID directory roles for the Graph/Exchange/SharePoint/Teams/ Compliance checks. **Power BI** checks additionally need **Power BI Service Administrator** or **Fabric Administrator** - Global Reader/Security Reader does not cover Power BI/Fabric tenant settings.
 - PowerShell modules (installed automatically by `Install-Prerequisites.ps1`): `Microsoft.Graph`, `ExchangeOnlineManagement`, `Microsoft.Online.SharePoint.PowerShell`, `MicrosoftTeams`, `MicrosoftPowerBIMgmt`, `ImportExcel`.
 - **Only for `-OutputFormat Pdf`** (everything else needs nothing extra): Python 3 with `pyyaml jinja2 markdown pypdf playwright Pillow` + `playwright install chromium`, and the PowerShell `powershell-yaml` module. See [PDF output](#pdf-output) below.
 
@@ -42,7 +42,7 @@ the third-party service icons used in the PDF/HTML reports.
 Import-Module .\EntrAudit.psd1
 ```
 
-## Usage — CLI (recommended)
+## Usage - CLI (recommended)
 
 EntrAudit.ps1 is a single-command front end over Connect/Invoke/Export. Run it
 with no arguments (or `-Help`) to see the full options screen:
@@ -67,7 +67,7 @@ with no arguments (or `-Help`) to see the full options screen:
 **Only connect the services this client's tenant actually has.** Anything you don't connect (or exclude via `-IgnoreCategory`) is automatically reported as NotApplicable in the output rather than attempted - how you tell the tool "this tenant doesn't use Power BI / Teams / Purview DLP / etc." Each service can
 use a different account if the client has split access across multiple accounts.
 
-## Usage — module functions directly
+## Usage - module functions directly
 
 If you want finer control than the CLI exposes, use the underlying functions directly: `Import-Module .\EntrAudit.psd1`, then `Connect-EntrAudit`, `Invoke-EntrAudit`, `Export-EntrAuditReport` as below.
 
@@ -105,12 +105,12 @@ Every check produces one of these `Status` values internally:
 | Status | Meaning |
 |---|---|
 | `Pass` | Setting matches the recommended/secure value. |
-| `Fail` | Setting does not match the recommended value — a candidate finding. |
+| `Fail` | Setting does not match the recommended value - a candidate finding. |
 | `ManualReview` | Data was retrieved but needs a human judgment call (no fixed threshold, or a nuanced multi-factor check), or no reliable API exists at all for this setting. |
 | `NotApplicable` | The required service wasn't connected for this engagement. |
-| `Error` | Something failed unexpectedly (wrong scope, throttling, etc.) — worth investigating, not just noise. |
+| `Error` | Something failed unexpectedly (wrong scope, throttling, etc.) - worth investigating, not just noise. |
 
-Every row carries an `AdminCenterPath` (shown as **Path** in reports) — for `ManualReview`/`Error` rows, or anything you want to screenshot by hand, that's
+Every row carries an `AdminCenterPath` (shown as **Path** in reports) - for `ManualReview`/`Error` rows, or anything you want to screenshot by hand, that's
 exactly where to go look. The Excel Summary sheet's "Service scope" block shows which of the six connections were actually established for that run.
 
 The **full JSON file** (`*-Full.json`) is always written regardless of `-OutputFormat`, and is the only output that includes each check's raw API
@@ -134,8 +134,8 @@ Want to see what the output looks like before running a real engagement? Run `.\
 - **Defender for Cloud Apps**: lives in its own admin surface (not Microsoft Graph). Ships as a manual-review deployment checklist (Cloud Discovery, app connectors, OAuth app governance, Conditional Access App Control) rather than live checks.
 - **Microsoft Forms**: no public admin Graph API exists for its tenant settings as of this writing. All three Forms checks are manual-review stubs.
 - A handful of Entra ID/Office settings (custom banned password list, "restrict access to Entra admin center", idle session timeout, LinkedIn connections, Sway external sharing) have no confirmed stable Graph property and are manual-review stubs rather than guessed mappings.
-- Power BI checks match tenant settings by their human-readable `title` text (the Admin REST API's `settingName` enum has shifted across versions) — if a match can't be confidently made, the check reports `ManualReview` rather than a possibly-wrong `Pass`.
+- Power BI checks match tenant settings by their human-readable `title` text (the Admin REST API's `settingName` enum has shifted across versions) - if a match can't be confidently made, the check reports `ManualReview` rather than a possibly-wrong `Pass`.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
