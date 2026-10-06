@@ -2,7 +2,7 @@
   
 <img alt="entraudit-banner" src="https://raw.githubusercontent.com/r0otsec/Entraudit/refs/heads/main/assets/entraudit-banner.png" />
 
-### A realistic, vulnerable CI/CD pipeline deployment lab lab for offensive and defensive training against CI/CD pipelines, DevOps and supply chains.
+### PowerShell-based automation for M365 and Entra ID reviews. Entraudit performs read-only configuration checks across Entra ID, Exchange Online, SharePoint, Teams, Intune and Purview.
 
 <br/>
 
