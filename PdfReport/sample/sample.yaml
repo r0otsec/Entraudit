@@ -1,0 +1,52 @@
+meta:
+  client: "Fabrikam Retail Group"
+  tenant: "Fabrikam Retail Group (8f3b2e4a-91c7-4a5e-b6d1-2c7e9a4f10b3)"
+  firm: "RootSec"
+  report_date: "2026-10-06"
+  classification: "Confidential"
+
+not_connected:
+  - category: "Power BI"
+    reason: "Power BI not connected for this engagement."
+    check_count: 4
+
+sections:
+  - title: "Identity / Entra ID"
+    findings:
+      - id: "ENTRA-01"
+        title: "Excessive Number of Global Administrators"
+        severity: "Medium"
+        rationale: "Twelve accounts hold the Global Administrator role, well above the recommended 1-5. Each Global Administrator can modify any security configuration, manage all users and groups, and reset credentials tenant-wide."
+        evidence: "12 Global Administrators found (recommended range: 1-5): j.carter@fabrikamretail.com, s.ahmed@fabrikamretail.com, m.obrien@fabrikamretail.com, svc-globaladmin@fabrikamretail.com, +8 more"
+        recommendation: "Review every Global Administrator assignment and remove the role from accounts that do not operationally require it. Prefer scoped roles (User Administrator, SharePoint Administrator, etc.) and PIM-eligible rather than permanent assignment. Target 1-5 standing Global Administrators."
+        config: "Entra admin center > Identity > Roles and administrators > Global Administrator > Assignments"
+        references:
+          - "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
+      - id: "ENTRA-03"
+        title: "Conditional Access Coverage for Administrative Roles"
+        severity: "High"
+        rationale: "MFA is enforced for admins via Conditional Access, but no policy requires the phishing-resistant authentication strength."
+        recommendation: "Ensure an enabled Conditional Access policy requires MFA (ideally phishing-resistant authentication strength) for all administrative directory roles."
+        config: "Entra admin center > Protection > Conditional Access > Policies"
+      - id: "ENTRA-15"
+        title: "Custom Banned Password List Not Confirmed"
+        severity: "Low"
+        rationale: "No stable Graph API exposes this setting reliably as of this writing - confirm by hand."
+        recommendation: "Enable \"Enforce custom list\" and populate it with brand names, product names, locations, and company-specific terms."
+        config: "Entra admin center > Protection > Authentication methods > Password protection"
+
+  - title: "Exchange Online"
+    findings:
+      - id: "EXO-03"
+        title: "External Sender Tagging Disabled"
+        severity: "Low"
+        rationale: "External sender tagging is enabled, helping users recognize inbound mail originating outside the organization."
+        recommendation: "No action required."
+        config: "N/A"
+      - id: "EXO-09"
+        title: "SPF Record Missing for an Accepted Domain"
+        severity: "Low"
+        rationale: "The primary accepted domain does not publish a valid SPF record, risking legitimate mail being marked as spam or spoofed."
+        evidence: "Domains missing a valid SPF record: fabrikamretail.com"
+        recommendation: "Publish an SPF TXT record for every accepted domain used to send mail, e.g. v=spf1 include:spf.protection.outlook.com -all"
+        config: "DNS provider for each accepted domain"

@@ -1,0 +1,390 @@
+/* ============================================================
+   EntrAudit M365 / Entra ID Review — PDF Stylesheet
+   Forked from RootSec's Folio pentest-report engine
+   (Documents\Github\Folio\pentest-report\templates\assets\style.css) —
+   design tokens, print setup, finding-card structure, and severity system
+   kept as-is since they're proven; cover and footer redesigned to match
+   the Swiss InfoSec M365 Security Checklist reference (logo top-left on
+   every page including the cover, solid red footer band with page number).
+   Engine: Playwright/Chromium (print-background: true)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ─── DESIGN TOKENS ────────────────────────────────────── */
+:root {
+  --navy:        #1a2744;
+  --navy-mid:    #243352;
+  --red:         #e63946;
+  --red-dark:    #c1121f;
+
+  --text:        #111827;
+  --text-sub:    #374151;
+  --text-muted:  #6b7280;
+  --text-light:  #9ca3af;
+
+  --white:       #ffffff;
+  --bg-light:    #f9fafb;
+  --bg-accent:   #f0f4ff;
+  --border:      #e5e7eb;
+  --border-mid:  #d1d5db;
+
+  /* Severity */
+  --crit:        #e63946;  --crit-bg:  #fef2f2;  --crit-border: #fca5a5;
+  --high:        #f4802b;  --high-bg:  #fff7ed;  --high-border: #fdba74;
+  --med:         #f5c518;  --med-bg:   #fffbeb;  --med-border:  #fcd34d;
+  --low:         #2196f3;  --low-bg:   #eff6ff;  --low-border:  #93c5fd;
+  --info:        #8b949e;  --info-bg:  #f9fafb;  --info-border: #d1d5db;
+
+  /* Status (Pass/Fail/ManualReview/NotApplicable/Error) — matches the
+     Excel/HTML color scheme already established elsewhere in EntrAudit */
+  --st-fail:   #c0392b;
+  --st-pass:   #27ae60;
+  --st-manual: #b8860b;
+  --st-na:     #7f8c8d;
+  --st-error:  #5b2c87;
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ─── PRINT SETUP ──────────────────────────────────────── */
+@page {
+  size: A4;
+  margin: 104px 0 96px 0;
+  background-color: white;
+}
+
+@page cover {
+  margin: 0;
+  background-color: white;
+}
+
+* {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: white;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-break  { page-break-before: always; break-before: page; }
+.avoid-break { page-break-inside: avoid;  break-inside: avoid; }
+.keep-next   { page-break-after: avoid;   break-after: avoid; }
+
+/* ─── BODY TYPOGRAPHY ──────────────────────────────────── */
+h1 { font-size: 20px; font-weight: 800; color: var(--navy); margin: 0 0 8px; }
+h2 { font-size: 15px; font-weight: 700; color: var(--navy); margin: 20px 0 10px; }
+h3 { font-size: 12.5px; font-weight: 600; color: var(--text-sub); margin: 14px 0 6px; }
+h4 { font-size: 10px;   font-weight: 700; color: var(--text-muted); margin: 10px 0 4px;
+     text-transform: uppercase; letter-spacing: 0.07em; }
+
+p  { margin: 0 0 10px; color: var(--text-sub); }
+a  { color: var(--red); text-decoration: none; }
+
+ul, ol { margin: 0 0 10px; padding-left: 20px; color: var(--text-sub); }
+li { margin-bottom: 4px; }
+li::marker { color: var(--red); }
+
+strong { font-weight: 600; color: var(--text); }
+em     { color: var(--text-muted); }
+code   { font-family: var(--font-mono); font-size: 10px;
+         background: #f3f4f6; color: #1f2937;
+         padding: 1px 5px; border-radius: 3px;
+         border: 1px solid var(--border); }
+
+/* ================================================================
+   COVER PAGE — logo top-left, a bold two-tone title, a numbered plain-
+   text contents list, a small metadata line near the bottom, thin red
+   bar at the very bottom. No badges, no tables, no legal block. Content
+   sits right under the logo (not vertically centered in a huge empty
+   flex region) and is sized to actually fill the page - the empty space
+   collects in one place below the content, pushed there by margin-top:
+   auto on the footer meta, rather than surrounding it on both sides.
+   ================================================================ */
+.cover-page {
+  page: cover;
+  page-break-after: always;
+  break-after: page;
+  width: 100%;
+  min-height: 297mm;
+  background: var(--white);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.cover-logo-row {
+  padding: 48px 56px 0;
+}
+
+.cover-logo {
+  max-height: 92px;
+  max-width: 320px;
+  object-fit: contain;
+}
+
+.cover-logo-text {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: 0.04em;
+}
+
+.cover-content {
+  padding: 64px 56px 0;
+}
+
+.cover-title {
+  font-size: 58px;
+  font-weight: 800;
+  line-height: 1.12;
+  margin: 0 0 40px;
+}
+.cover-title .accent { color: var(--red); }
+.cover-title .plain { color: var(--text); }
+
+.cover-contents-label {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+.cover-contents-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 18px;
+}
+.cover-contents-list li {
+  font-size: 18px;
+  color: var(--text);
+  padding: 7px 0;
+}
+
+.cover-footer-meta {
+  margin-top: auto;
+  padding: 0 56px 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cover-bottom-bar {
+  height: 10px;
+  background: var(--red);
+  width: 100%;
+}
+
+/* ================================================================
+   TABLE OF CONTENTS — plain page, one row per section, dotted leader
+   out to a right-aligned page number (stamped in by generate_pdf.py
+   via a small JS pass after layout, same technique as Folio's engine).
+   ================================================================ */
+.toc-page {
+  padding: 48px 72px 24px;
+  page-break-before: always;
+  break-before: page;
+}
+
+.toc-heading {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 28px;
+}
+
+.toc-body { display: flex; flex-direction: column; }
+
+.toc-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 0;
+  color: var(--text);
+  text-decoration: none;
+}
+.toc-row:first-child { padding-top: 0; }
+
+.toc-number { font-weight: 700; color: var(--text); flex: 0 0 auto; }
+.toc-label  { font-weight: 600; font-size: 13px; color: var(--text); flex: 0 0 auto; }
+.toc-leader { flex: 1; border-bottom: 1px dotted var(--border-mid); margin: 0 6px 3px; }
+.toc-page-num { font-size: 12px; font-weight: 700; color: var(--text-muted); flex: 0 0 auto; }
+
+.toc-sub-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 0 3px 26px;
+  border-bottom: none;
+  color: var(--text-sub);
+  text-decoration: none;
+}
+.toc-sub-id { font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; color: var(--text-muted); flex: 0 0 auto; }
+.toc-sub-title { font-size: 10.5px; color: var(--text-sub); }
+
+/* ================================================================
+   SECTION WRAPPER — white pages, one per category. Headings are a
+   plain numbered title (literal Swiss InfoSec style) — no colored
+   banner, just bold black text with a leading section number.
+   ================================================================ */
+.report-section {
+  padding: 32px 72px 24px;
+  page-break-before: always;
+  break-before: page;
+}
+
+.section-header {
+  margin-bottom: 22px;
+  break-inside: avoid;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+/* ================================================================
+   SEVERITY & STATUS BADGES
+   ================================================================ */
+.sev-badge {
+  display: inline-block;
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 3px;
+  color: white; white-space: nowrap;
+}
+
+.sev-badge.critical { background: var(--crit); }
+.sev-badge.high     { background: var(--high); }
+.sev-badge.medium   { background: var(--med); color: #1a1a1a; }
+.sev-badge.low      { background: var(--low); }
+.sev-badge.informational { background: var(--info); }
+
+/* ================================================================
+   FINDING CARD — literal Swiss InfoSec table shape: one rounded-corner
+   card, a single vertical rule between the label column and the content
+   column running the full height, a horizontal rule between every row,
+   plain bold-black labels (no colored banner). Deliberately simple.
+   ================================================================ */
+.finding-card {
+  border: 1px solid var(--border-mid);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  break-inside: avoid;
+  box-shadow: 0 1px 5px rgba(17, 24, 39, 0.08);
+  /* Inset padding so the row/column divider lines stop short of the rounded
+     outer border instead of running flush to it, matching the reference. */
+  padding: 12px 16px;
+}
+
+.fc-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border-mid);
+}
+.fc-row:last-child { border-bottom: none; }
+
+.fc-label {
+  flex: 0 0 150px;
+  padding: 10px 16px;
+  font-weight: 700;
+  color: var(--text);
+  border-right: 1px solid var(--border-mid);
+  display: flex;
+  align-items: center;
+}
+
+.fc-content {
+  flex: 1;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--text-sub);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.fc-row-header .fc-label {
+  justify-content: center;
+  padding: 10px;
+}
+.fc-icon { width: 64px; height: 64px; flex: 0 0 auto; }
+.fc-icon svg { width: 100%; height: 100%; display: block; }
+
+.fc-row-header .fc-content {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.fc-id {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.fc-content.config {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.fc-evidence {
+  flex-basis: 100%;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: #1f2937;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.fc-refs { list-style: none; margin: 0; padding: 0; flex-basis: 100%; }
+.fc-refs li { font-size: 9.5px; padding: 1px 0; }
+.fc-refs a { color: #1a7dd9; word-break: break-all; }
+
+/* ================================================================
+   SUMMARY TABLE (intro page)
+   ================================================================ */
+.data-table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 16px; border: 1px solid var(--border-mid); box-shadow: 0 1px 5px rgba(17, 24, 39, 0.08); }
+.data-table th {
+  background: var(--navy); color: white;
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 8px 12px; text-align: left;
+}
+.data-table td { padding: 8px 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:nth-child(even) td { background: var(--bg-light); }
+
+/* ================================================================
+   MARKDOWN CONTENT
+   ================================================================ */
+.md-content h1 { font-size: 14px; margin: 12px 0 6px; color: var(--navy); }
+.md-content h2 { font-size: 12px; margin: 10px 0 5px; color: var(--navy); }
+.md-content p  { color: var(--text-sub); margin: 0 0 7px; }
+.md-content ul, .md-content ol { color: var(--text-sub); margin: 0 0 7px; padding-left: 20px; }
+.md-content a { display: inline-block; vertical-align: baseline; color: #1a7dd9; }

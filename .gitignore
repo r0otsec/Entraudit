@@ -1,0 +1,18 @@
+# Default CLI/module output - real engagement data must never be committed
+/Reports/
+/SampleOutput/
+
+# Python build artifacts (PdfReport/generate_pdf.py)
+__pycache__/
+*.pyc
+
+# PDF engine temp files (cleaned up automatically on success, but just in case
+# a run is interrupted mid-render)
+_tmp_report.html
+_tmp_cover.html
+*.body.tmp.pdf
+*.cover.tmp.pdf
+
+# OS cruft
+.DS_Store
+Thumbs.db

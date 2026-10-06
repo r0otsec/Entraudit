@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ report.meta.client }} — M365 / Entra ID Security Review</title>
+  <style>{{ css_content }}</style>
+</head>
+<body>
+
+  {% set has_notconn = report.not_connected and report.not_connected | length > 0 %}
+  {% set cat_offset = 2 if has_notconn else 1 %}
+
+  {% include 'templates/_cover.html.j2' %}
+  {% include 'templates/_toc.html.j2' %}
+
+  {# ── Summary page — severity breakdown (Status is never shown) ──── #}
+  <div class="report-section" id="summary">
+    <div class="section-header">
+      <p class="section-title">1. Engagement Summary</p>
+      <p class="section-subtitle">Results by category</p>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Category</th><th>Total</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Informational</th></tr>
+      </thead>
+      <tbody>
+        {% for row in report.summary.by_category %}
+        <tr>
+          <td><strong>{{ row.category }}</strong></td>
+          <td>{{ row.total }}</td>
+          <td>{{ row.critical }}</td>
+          <td>{{ row.high }}</td>
+          <td>{{ row.medium }}</td>
+          <td>{{ row.low }}</td>
+          <td>{{ row.informational }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Not Connected / Not Tested — services out of scope for this engagement,
+     so no findings appear below for these categories ───────────────── #}
+  {% if has_notconn %}
+  <div class="report-section" id="not-connected">
+    <div class="section-header">
+      <p class="section-title">2. Not Connected / Not Tested</p>
+      <p class="section-subtitle">No findings are listed below for these categories</p>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Category</th><th>Reason</th><th>Checks skipped</th></tr>
+      </thead>
+      <tbody>
+        {% for nc in report.not_connected %}
+        <tr>
+          <td><strong>{{ nc.category }}</strong></td>
+          <td>{{ nc.reason }}</td>
+          <td>{{ nc.check_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# ── One section per category ──────────────────────────────────── #}
+  {% for section in report.sections %}
+  <div class="report-section" id="section-{{ section.slug }}">
+    <div class="section-header">
+      <p class="section-title">{{ loop.index + cat_offset }}. {{ section.title }}</p>
+      <p class="section-subtitle">{{ section.findings | length }} check(s)</p>
+    </div>
+
+    {% for f in section.findings %}
+      {% include 'templates/_finding.html.j2' %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+</body>
+</html>

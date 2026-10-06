@@ -1,0 +1,42 @@
+{# ── COVER PAGE — logo top-left, a bold two-tone title, a numbered plain-text
+     contents list, a small metadata line near the bottom. Literal Swiss InfoSec
+     layout (not Folio's dark hero cover), sized to actually fill the page
+     rather than centering in a sea of empty space. Expects has_notconn/
+     cat_offset in scope (set by report.html.j2 before this include). ── #}
+{% set meta = report.meta %}
+{# Self-contained (not inherited from report.html.j2's own {% set %}) since this
+   partial is also rendered standalone for the headerless cover-only PDF pass
+   (render_cover_html in generate_pdf.py), which has no surrounding context. #}
+{% set has_notconn = report.not_connected and report.not_connected | length > 0 %}
+{% set cat_offset = 2 if has_notconn else 1 %}
+
+<div class="cover-page">
+
+  <div class="cover-logo-row">
+    {% if report._company_logo %}
+      <img class="cover-logo" src="{{ report._company_logo }}" alt="{{ meta.firm }}">
+    {% else %}
+      <div class="cover-logo-text">{{ meta.firm | upper }}</div>
+    {% endif %}
+  </div>
+
+  <div class="cover-content">
+    <h1 class="cover-title"><span class="accent">M365 / Entra ID</span> <span class="plain">Security Review</span></h1>
+
+    <p class="cover-contents-label">Contents</p>
+    <ul class="cover-contents-list">
+      <li>1. Engagement Summary</li>
+      {% if has_notconn %}<li>2. Not Connected / Not Tested</li>{% endif %}
+      {% for cat in report.category_names %}
+      <li>{{ loop.index + cat_offset }}. {{ cat }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <p class="cover-footer-meta">
+    {{ meta.client }} &nbsp;&bull;&nbsp; {{ meta.tenant }} &nbsp;&bull;&nbsp;
+    {{ meta.report_date_fmt or meta.report_date }} &nbsp;&bull;&nbsp; {{ meta.classification or 'Confidential' }}
+  </p>
+
+  <div class="cover-bottom-bar"></div>
+</div>

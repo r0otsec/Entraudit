@@ -1,0 +1,57 @@
+{# ── FINDING CARD ──────────────────────────────────────────────────────────
+   Literal Swiss InfoSec table shape: one rounded card, a single vertical
+   rule between label/content columns, a horizontal rule between rows.
+   Expects: f in scope (one result dict, pre-processed by generate_pdf.py).
+─────────────────────────────────────────────────────────────────────────#}
+<div class="finding-card" id="finding-{{ f.id | lower }}">
+
+  <div class="fc-row fc-row-header">
+    <div class="fc-label fc-icon">{{ f.icon_svg | safe }}</div>
+    <div class="fc-content"><span class="fc-id">{{ f.id }}</span> &mdash; {{ f.title }}</div>
+  </div>
+
+  <div class="fc-row">
+    <div class="fc-label">Rating</div>
+    <div class="fc-content">
+      <span class="sev-badge {{ f.severity_key }}">{{ f.severity }}</span>
+    </div>
+  </div>
+
+  {% if f.rationale_html %}
+  <div class="fc-row">
+    <div class="fc-label">Summary</div>
+    <div class="fc-content">
+      <div class="md-content">{{ f.rationale_html | safe }}</div>
+      {% if f.evidence %}<div class="fc-evidence">{{ f.evidence }}</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if f.recommendation_html %}
+  <div class="fc-row">
+    <div class="fc-label">Remediation</div>
+    <div class="fc-content"><div class="md-content">{{ f.recommendation_html | safe }}</div></div>
+  </div>
+  {% endif %}
+
+  {% if f.config %}
+  <div class="fc-row">
+    <div class="fc-label">Path</div>
+    <div class="fc-content config">{{ f.config }}</div>
+  </div>
+  {% endif %}
+
+  {% if f.references %}
+  <div class="fc-row">
+    <div class="fc-label">Reference</div>
+    <div class="fc-content">
+      <ul class="fc-refs">
+        {% for ref in f.references %}
+        <li><a href="{{ ref }}">{{ ref }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+</div>

@@ -1,0 +1,40 @@
+{# ── TABLE OF CONTENTS ─────────────────────────────────────────────────────
+   One row per numbered section (Engagement Summary + optional Not Connected
+   + each category), dotted leader out to a page number. The page number is
+   blank here and gets stamped in by generate_pdf.py after layout (same
+   breaker-counting JS trick as Folio's engine) — .toc-row IS the <a>, matched
+   against each section's id. Self-contained (not inherited from report.html.j2)
+   so it renders correctly even if ever included standalone.
+─────────────────────────────────────────────────────────────────────────#}
+{% set has_notconn = report.not_connected and report.not_connected | length > 0 %}
+{% set cat_offset = 2 if has_notconn else 1 %}
+<div class="toc-page">
+  <h1 class="toc-heading">Contents</h1>
+  <div class="toc-body">
+    <a class="toc-row toc-link" href="#summary">
+      <span class="toc-number">1.</span>
+      <span class="toc-label">Engagement Summary</span>
+      <span class="toc-leader"></span>
+    </a>
+    {% if has_notconn %}
+    <a class="toc-row toc-link" href="#not-connected">
+      <span class="toc-number">2.</span>
+      <span class="toc-label">Not Connected / Not Tested</span>
+      <span class="toc-leader"></span>
+    </a>
+    {% endif %}
+    {% for section in report.sections %}
+    <a class="toc-row toc-link" href="#section-{{ section.slug }}">
+      <span class="toc-number">{{ loop.index + cat_offset }}.</span>
+      <span class="toc-label">{{ section.title }}</span>
+      <span class="toc-leader"></span>
+    </a>
+    {% for f in section.findings %}
+    <a class="toc-row toc-sub-row" href="#finding-{{ f.id | lower }}">
+      <span class="toc-sub-id">{{ f.id }}</span>
+      <span class="toc-sub-title">{{ f.title }}</span>
+    </a>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</div>
