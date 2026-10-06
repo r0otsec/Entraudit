@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
 
 <br/>
+</div>
 
 # EntrAudit
 
